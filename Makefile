@@ -5,7 +5,8 @@
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
-  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16 -std=gnu99 -D_GNU_SOURCE
+  USE_OPT = -O2 -fomit-frame-pointer -falign-functions=16 -std=gnu99 -D_GNU_SOURCE
+  #-ggdb
   USE_OPT += -DBOARD_OTG_NOVBUSSENS $(build_args)
   USE_OPT += -fsingle-precision-constant -Wdouble-promotion
 endif
@@ -106,7 +107,8 @@ include $(CHIBIOS)/os/rt/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
 # Other files
 include hwconf/hwconf.mk
 include applications/applications.mk
-include nrf/nrf.mk
+
+#include nrf/nrf.mk
 
 # Define linker script file here
 LDSCRIPT= ld_eeprom_emu.ld
@@ -140,7 +142,6 @@ CSRC = $(STARTUPSRC) \
        eeprom.c \
        commands.c \
        timeout.c \
-       comm_can.c \
        ws2811.c \
        led_external.c \
        encoder.c \
@@ -150,6 +151,8 @@ CSRC = $(STARTUPSRC) \
        $(HWSRC) \
        $(APPSRC) \
        $(NRFSRC)
+
+#      comm_can.c \
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.

@@ -21,9 +21,9 @@
 #include "ch.h"
 #include "hal.h"
 #include "hw.h"
-#include "nrf_driver.h"
-#include "rfhelp.h"
-#include "comm_can.h"
+//#include "nrf_driver.h"
+//#include "rfhelp.h"
+//#include "comm_can.h"
 
 // Private variables
 static app_configuration appconf;
@@ -41,15 +41,15 @@ const app_configuration* app_get_configuration(void) {
 void app_set_configuration(app_configuration *conf) {
 	appconf = *conf;
 
-	app_ppm_stop();
-	app_adc_stop();
+//	app_ppm_stop();
+//	app_adc_stop();
 	app_uartcomm_stop();
-	app_nunchuk_stop();
+//	app_nunchuk_stop();
 
-	if (!conf_general_permanent_nrf_found) {
+/*	if (!conf_general_permanent_nrf_found) {
 		nrf_driver_stop();
 	}
-
+*/
 #if CAN_ENABLE
 	comm_can_set_baud(conf->can_baud_rate);
 #endif
@@ -60,11 +60,11 @@ void app_set_configuration(app_configuration *conf) {
 
 	switch (appconf.app_to_use) {
 	case APP_PPM:
-		app_ppm_start();
+//		app_ppm_start();
 		break;
 
 	case APP_ADC:
-		app_adc_start(true);
+//		app_adc_start(true);
 		break;
 
 	case APP_UART:
@@ -73,26 +73,26 @@ void app_set_configuration(app_configuration *conf) {
 		break;
 
 	case APP_PPM_UART:
-		hw_stop_i2c();
+/*		hw_stop_i2c();
 		app_ppm_start();
-		app_uartcomm_start();
+		app_uartcomm_start();*/
 		break;
 
 	case APP_ADC_UART:
 		hw_stop_i2c();
-		app_adc_start(false);
+//		app_adc_start(false);
 		app_uartcomm_start();
 		break;
 
 	case APP_NUNCHUK:
-		app_nunchuk_start();
+//		app_nunchuk_start();
 		break;
 
 	case APP_NRF:
-		if (!conf_general_permanent_nrf_found) {
+/*		if (!conf_general_permanent_nrf_found) {
 			nrf_driver_init();
 			rfhelp_restart();
-		}
+		}*/
 		break;
 
 	case APP_CUSTOM:
@@ -106,14 +106,14 @@ void app_set_configuration(app_configuration *conf) {
 		break;
 	}
 
-	app_ppm_configure(&appconf.app_ppm_conf);
-	app_adc_configure(&appconf.app_adc_conf);
+//	app_ppm_configure(&appconf.app_ppm_conf);
+//	app_adc_configure(&appconf.app_adc_conf);
 	app_uartcomm_configure(appconf.app_uart_baudrate);
-	app_nunchuk_configure(&appconf.app_chuk_conf);
+//	app_nunchuk_configure(&appconf.app_chuk_conf);
 
 #ifdef APP_CUSTOM_TO_USE
 	app_custom_configure(&appconf);
 #endif
 
-	rfhelp_update_conf(&appconf.app_nrf_conf);
+//	rfhelp_update_conf(&appconf.app_nrf_conf);
 }

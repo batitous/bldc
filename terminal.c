@@ -219,7 +219,7 @@ void terminal_process_string(char *str) {
 		commands_printf("Cycle int limit running: %.2f", (double)rpm_dep.cycle_int_limit_running);
 		commands_printf("Cycle int limit max: %.2f\n", (double)rpm_dep.cycle_int_limit_max);
 	} else if (strcmp(argv[0], "can_devs") == 0) {
-		commands_printf("CAN devices seen on the bus the past second:\n");
+	/*	commands_printf("CAN devices seen on the bus the past second:\n");
 		for (int i = 0;i < CAN_STATUS_MSGS_TO_STORE;i++) {
 			can_status_msg *msg = comm_can_get_status_msg_index(i);
 
@@ -232,6 +232,7 @@ void terminal_process_string(char *str) {
 				commands_printf("Duty               : %.2f\n", (double)msg->duty);
 			}
 		}
+		*/
 	} else if (strcmp(argv[0], "foc_encoder_detect") == 0) {
 		if (argc == 2) {
 			float current = -1.0;

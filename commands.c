@@ -37,7 +37,7 @@
 #include "utils.h"
 #include "packet.h"
 #include "encoder.h"
-#include "nrf_driver.h"
+//#include "nrf_driver.h"
 
 #include <math.h>
 #include <string.h>
@@ -794,36 +794,36 @@ void commands_process_packet(unsigned char *data, unsigned int len) {
 		break;
 
 	case COMM_GET_DECODED_PPM:
-		ind = 0;
+/*		ind = 0;
 		send_buffer[ind++] = COMM_GET_DECODED_PPM;
 		buffer_append_int32(send_buffer, (int32_t)(app_ppm_get_decoded_level() * 1000000.0), &ind);
 		buffer_append_int32(send_buffer, (int32_t)(servodec_get_last_pulse_len(0) * 1000000.0), &ind);
-		commands_send_packet(send_buffer, ind);
+		commands_send_packet(send_buffer, ind);*/
 		break;
 
 	case COMM_GET_DECODED_ADC:
-		ind = 0;
+/*		ind = 0;
 		send_buffer[ind++] = COMM_GET_DECODED_ADC;
 		buffer_append_int32(send_buffer, (int32_t)(app_adc_get_decoded_level() * 1000000.0), &ind);
 		buffer_append_int32(send_buffer, (int32_t)(app_adc_get_voltage() * 1000000.0), &ind);
 		buffer_append_int32(send_buffer, (int32_t)(app_adc_get_decoded_level2() * 1000000.0), &ind);
 		buffer_append_int32(send_buffer, (int32_t)(app_adc_get_voltage2() * 1000000.0), &ind);
-		commands_send_packet(send_buffer, ind);
+		commands_send_packet(send_buffer, ind);*/
 		break;
 
 	case COMM_GET_DECODED_CHUK:
-		ind = 0;
+/*		ind = 0;
 		send_buffer[ind++] = COMM_GET_DECODED_CHUK;
 		buffer_append_int32(send_buffer, (int32_t)(app_nunchuk_get_decoded_chuk() * 1000000.0), &ind);
-		commands_send_packet(send_buffer, ind);
+		commands_send_packet(send_buffer, ind);*/
 		break;
 
 	case COMM_FORWARD_CAN:
-		comm_can_send_buffer(data[0], data + 1, len - 1, false);
+//		comm_can_send_buffer(data[0], data + 1, len - 1, false);
 		break;
 
 	case COMM_SET_CHUCK_DATA:
-		ind = 0;
+/*		ind = 0;
 		chuck_d_tmp.js_x = data[ind++];
 		chuck_d_tmp.js_y = data[ind++];
 		chuck_d_tmp.bt_c = data[ind++];
@@ -831,7 +831,7 @@ void commands_process_packet(unsigned char *data, unsigned int len) {
 		chuck_d_tmp.acc_x = buffer_get_int16(data, &ind);
 		chuck_d_tmp.acc_y = buffer_get_int16(data, &ind);
 		chuck_d_tmp.acc_z = buffer_get_int16(data, &ind);
-		app_nunchuk_update_output(&chuck_d_tmp);
+		app_nunchuk_update_output(&chuck_d_tmp);*/
 		break;
 
 	case COMM_CUSTOM_APP_DATA:
@@ -841,13 +841,13 @@ void commands_process_packet(unsigned char *data, unsigned int len) {
 		break;
 
 	case COMM_NRF_START_PAIRING:
-		ind = 0;
+/*		ind = 0;
 		nrf_driver_start_pairing(buffer_get_int32(data, &ind));
 
 		ind = 0;
 		send_buffer[ind++] = packet_id;
 		send_buffer[ind++] = NRF_PAIR_STARTED;
-		commands_send_packet(send_buffer, ind);
+		commands_send_packet(send_buffer, ind);*/
 		break;
 
 	default:
