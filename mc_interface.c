@@ -28,7 +28,6 @@
 #include "ch.h"
 #include "hal.h"
 #include "commands.h"
-#include "encoder.h"
 #include "drv8301.h"
 #include "buffer.h"
 #include <math.h>
@@ -140,11 +139,9 @@ void mc_interface_init(mc_configuration *configuration) {
 #if !WS2811_ENABLE
 	switch (m_conf.m_sensor_port_mode) {
 	case SENSOR_PORT_MODE_ABI:
-		encoder_init_abi(m_conf.m_encoder_counts);
 		break;
 
 	case SENSOR_PORT_MODE_AS5047_SPI:
-		encoder_init_as5047p_spi();
 		break;
 
 	default:
@@ -175,14 +172,11 @@ const volatile mc_configuration* mc_interface_get_configuration(void) {
 void mc_interface_set_configuration(mc_configuration *configuration) {
 #if !WS2811_ENABLE
 	if (m_conf.m_sensor_port_mode != configuration->m_sensor_port_mode) {
-		encoder_deinit();
 		switch (configuration->m_sensor_port_mode) {
 		case SENSOR_PORT_MODE_ABI:
-			encoder_init_abi(configuration->m_encoder_counts);
 			break;
 
 		case SENSOR_PORT_MODE_AS5047_SPI:
-			encoder_init_as5047p_spi();
 			break;
 
 		default:
@@ -190,9 +184,6 @@ void mc_interface_set_configuration(mc_configuration *configuration) {
 		}
 	}
 
-	if (configuration->m_sensor_port_mode == SENSOR_PORT_MODE_ABI) {
-		encoder_set_counts(configuration->m_encoder_counts);
-	}
 #endif
 
 #ifdef HW_HAS_DRV8301
@@ -903,7 +894,7 @@ float mc_interface_get_pid_pos_now(void) {
 	switch (m_conf.motor_type) {
 	case MOTOR_TYPE_BLDC:
 	case MOTOR_TYPE_DC:
-		ret = encoder_read_deg();
+		//ret = encoder_read_deg();
 		break;
 
 	case MOTOR_TYPE_FOC:
@@ -1044,7 +1035,7 @@ void mc_interface_fault_stop(mc_fault_code fault) {
 			fdata.drv8301_faults = drv8301_read_faults();
 		}
 #endif
-		terminal_add_fault_data(&fdata);
+//		terminal_add_fault_data(&fdata);
 	}
 
 	m_ignore_iterations = m_conf.m_fault_stop_time_ms;

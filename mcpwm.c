@@ -30,7 +30,6 @@
 #include "utils.h"
 #include "ledpwm.h"
 #include "terminal.h"
-#include "encoder.h"
 
 // Structs
 typedef struct {
@@ -1218,7 +1217,7 @@ static void run_pid_control_speed(void) {
 #endif
 }
 
-static void run_pid_control_pos(float dt) {
+/*static void run_pid_control_pos(float dt) {
 	static float i_term = 0;
 	static float prev_error = 0;
 	float p_term;
@@ -1250,7 +1249,7 @@ static void run_pid_control_pos(float dt) {
 	utils_truncate_number(&output, -1.0, 1.0);
 
 	current_set = output * conf->lo_current_max;
-}
+}*/
 
 static THD_FUNCTION(rpm_thread, arg) {
 	(void)arg;
@@ -2063,10 +2062,6 @@ void mcpwm_adc_int_handler(void *p, uint32_t flags) {
 	}
 
 	mc_interface_mc_timer_isr();
-
-	if (encoder_is_configured()) {
-		run_pid_control_pos(1.0 / switching_frequency_now);
-	}
 
 	last_adc_isr_duration = (float)TIM12->CNT / 10000000.0;
 }

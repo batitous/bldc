@@ -32,12 +32,9 @@
 #include "app.h"
 #include "timeout.h"
 #include "servo_dec.h"
-#include "comm_can.h"
 #include "flash_helper.h"
 #include "utils.h"
 #include "packet.h"
-#include "encoder.h"
-//#include "nrf_driver.h"
 
 #include <math.h>
 #include <string.h>
@@ -626,8 +623,8 @@ void commands_process_packet(unsigned char *data, unsigned int len) {
 	} break;
 
 	case COMM_TERMINAL_CMD:
-		data[len] = '\0';
-		terminal_process_string((char*)data);
+//		data[len] = '\0';
+//		terminal_process_string((char*)data);
 		break;
 
 	case COMM_DETECT_MOTOR_PARAM:
@@ -700,45 +697,12 @@ void commands_process_packet(unsigned char *data, unsigned int len) {
 	break;
 
 	case COMM_DETECT_ENCODER: {
-		if (encoder_is_configured()) {
-			mcconf = *mc_interface_get_configuration();
-			mcconf_old = mcconf;
-
-			send_func_last = send_func;
-
-			ind = 0;
-			float current = buffer_get_float32(data, 1e3, &ind);
-
-			mcconf.motor_type = MOTOR_TYPE_FOC;
-			mcconf.foc_f_sw = 10000.0;
-			mcconf.foc_current_kp = 0.01;
-			mcconf.foc_current_ki = 10.0;
-			mc_interface_set_configuration(&mcconf);
-
-			float offset = 0.0;
-			float ratio = 0.0;
-			bool inverted = false;
-			mcpwm_foc_encoder_detect(current, false, &offset, &ratio, &inverted);
-			mc_interface_set_configuration(&mcconf_old);
-
-			ind = 0;
-			send_buffer[ind++] = COMM_DETECT_ENCODER;
-			buffer_append_float32(send_buffer, offset, 1e6, &ind);
-			buffer_append_float32(send_buffer, ratio, 1e6, &ind);
-			send_buffer[ind++] = inverted;
-			if (send_func_last) {
-				send_func_last(send_buffer, ind);
-			} else {
-				commands_send_packet(send_buffer, ind);
-			}
-		} else {
-			ind = 0;
-			send_buffer[ind++] = COMM_DETECT_ENCODER;
-			buffer_append_float32(send_buffer, 1001.0, 1e6, &ind);
-			buffer_append_float32(send_buffer, 0.0, 1e6, &ind);
-			send_buffer[ind++] = false;
-			commands_send_packet(send_buffer, ind);
-		}
+		ind = 0;
+		send_buffer[ind++] = COMM_DETECT_ENCODER;
+		buffer_append_float32(send_buffer, 1001.0, 1e6, &ind);
+		buffer_append_float32(send_buffer, 0.0, 1e6, &ind);
+		send_buffer[ind++] = false;
+		commands_send_packet(send_buffer, ind);
 	}
 	break;
 

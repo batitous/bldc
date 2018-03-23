@@ -38,15 +38,8 @@
 #include "packet.h"
 #include "commands.h"
 #include "timeout.h"
-#include "comm_can.h"
-#include "ws2811.h"
-#include "led_external.h"
-#include "encoder.h"
 #include "servo_simple.h"
 #include "utils.h"
-//#include "nrf_driver.h"
-//#include "rfhelp.h"
-//#include "spi_sw.h"
 
 /*
  * Timers used:
@@ -110,7 +103,7 @@ static THD_FUNCTION(periodic_thread, arg) {
 
 		switch (display_mode) {
 			case DISP_POS_MODE_ENCODER:
-				commands_send_rotor_pos(encoder_read_deg());
+				commands_send_rotor_pos(0);
 				break;
 
 			case DISP_POS_MODE_PID_POS:
@@ -202,113 +195,21 @@ int main(void) {
 	commands_init();
 	comm_usb_init();
 
-#if CAN_ENABLE
-	comm_can_init();
-#endif
-
 	app_configuration appconf;
 	conf_general_read_app_configuration(&appconf);
 	app_set_configuration(&appconf);
 
-#ifdef HW_HAS_PERMANENT_NRF
-	conf_general_permanent_nrf_found = nrf_driver_init();
-	if (conf_general_permanent_nrf_found) {
-		rfhelp_restart();
-	} else {
-		nrf_driver_stop();
-		// Set the nrf SPI pins to the general SPI interface so that
-		// an external NRF can be used with the NRF app.
-		spi_sw_change_pins(
-				HW_SPI_PORT_NSS, HW_SPI_PIN_NSS,
-				HW_SPI_PORT_SCK, HW_SPI_PIN_SCK,
-				HW_SPI_PORT_MOSI, HW_SPI_PIN_MOSI,
-				HW_SPI_PORT_MISO, HW_SPI_PIN_MISO);
-	}
-#endif
-
 	timeout_init();
 	timeout_configure(appconf.timeout_msec, appconf.timeout_brake_current);
 
-#if WS2811_ENABLE
-	ws2811_init();
-#if !WS2811_TEST
-	led_external_init();
-#endif
-#endif
-
-#if SERVO_OUT_ENABLE
-	servo_simple_init();
-#endif
 
 	// Threads
 	chThdCreateStatic(periodic_thread_wa, sizeof(periodic_thread_wa), NORMALPRIO, periodic_thread, NULL);
 	chThdCreateStatic(timer_thread_wa, sizeof(timer_thread_wa), NORMALPRIO, timer_thread, NULL);
 
-#if WS2811_TEST
-	unsigned int color_ind = 0;
-	const int num = 4;
-	const uint32_t colors[] = {COLOR_RED, COLOR_GOLD, COLOR_GRAY, COLOR_MAGENTA, COLOR_BLUE};
-	const int brightness_set = 100;
-
-	for (;;) {
-		chThdSleepMilliseconds(1000);
-
-		for (int i = 0;i < brightness_set;i++) {
-			ws2811_set_brightness(i);
-			chThdSleepMilliseconds(10);
-		}
-
-		chThdSleepMilliseconds(1000);
-
-		for(int i = -num;i <= WS2811_LED_NUM;i++) {
-			ws2811_set_led_color(i - 1, COLOR_BLACK);
-			ws2811_set_led_color(i + num, colors[color_ind]);
-
-			ws2811_set_led_color(0, COLOR_RED);
-			ws2811_set_led_color(WS2811_LED_NUM - 1, COLOR_GREEN);
-
-			chThdSleepMilliseconds(50);
-		}
-
-		for (int i = 0;i < brightness_set;i++) {
-			ws2811_set_brightness(brightness_set - i);
-			chThdSleepMilliseconds(10);
-		}
-
-		color_ind++;
-		if (color_ind >= sizeof(colors) / sizeof(uint32_t)) {
-			color_ind = 0;
-		}
-
-		static int asd = 0;
-		asd++;
-		if (asd >= 3) {
-			asd = 0;
-
-			for (unsigned int i = 0;i < sizeof(colors) / sizeof(uint32_t);i++) {
-				ws2811_set_all(colors[i]);
-
-				for (int i = 0;i < brightness_set;i++) {
-					ws2811_set_brightness(i);
-					chThdSleepMilliseconds(2);
-				}
-
-				chThdSleepMilliseconds(100);
-
-				for (int i = 0;i < brightness_set;i++) {
-					ws2811_set_brightness(brightness_set - i);
-					chThdSleepMilliseconds(2);
-				}
-			}
-		}
-	}
-#endif
 
 	for(;;) {
 		chThdSleepMilliseconds(10);
 
-		if (encoder_is_configured()) {
-			//		comm_can_set_pos(0, encoder_read_deg());
-		}
 	}
 }
